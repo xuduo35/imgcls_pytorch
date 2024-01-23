@@ -21,7 +21,7 @@ CUDA_VISIBLE_DEVICES=0 python3 -u train.py --backbone resnet101 --classnum 270 -
 ## Demo
 CUDA_VISIBLE_DEVICES=0 PORT=8000 python3 -u app.py
 
-## Chinese support
+## Tensorboard displaying Chinese support
 ```shell
 python3 fixfont.py
 ```
