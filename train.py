@@ -22,6 +22,9 @@ from torch.utils.data import Dataset
 from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = ['SimHei'] # Support displaying Chinese
 #plt.rcParams['axes.unicode_minus'] = False
@@ -82,6 +85,8 @@ def initialize_dataset(image_dir, classnum=1000):
     if not os.path.exists(trainfilepath) or not os.path.exists(labelfilepath):
         classes = os.listdir(image_dir)
         assert(len(classes) == classnum)
+
+        print([(classitem.replace("_bd", ""), i) for i,classitem in enumerate(classes)])
 
         for i, classitem in enumerate(classes):
             classitemdir = os.path.join(image_dir, classitem)
@@ -250,8 +255,8 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
     net = get_net(backbone, 3, classnum)
 
     if ckptpath is not None:
-        print("finetuing from {args.fromckpt}...")
-        net.load_state_dict(torch.load(args.fromckpt))
+        print("finetuing from {args.ckptpath}...")
+        net.load_state_dict(torch.load(args.ckptpath))
 
     classes, image_files, image_labels = initialize_dataset(args.datadir, args.classnum)
     result = list(zip(image_files, image_labels))
@@ -268,8 +273,10 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
             args.classnum,
             transforms.Compose([
                 transforms.RandomRotation([-13,13]),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomVerticalFlip(p=0.5),
                 transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
-                transforms.Resize(args.imgsz+32),
+                transforms.Resize(args.imgsz+32*(args.imgsz//256+1)),
                 transforms.RandomCrop(args.imgsz),
                 transforms.ToTensor(),
                 normalize
