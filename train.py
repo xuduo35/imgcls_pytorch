@@ -86,8 +86,6 @@ def initialize_dataset(image_dir, classnum=1000):
         classes = os.listdir(image_dir)
         assert(len(classes) == classnum)
 
-        print([(classitem.replace("_bd", ""), i) for i,classitem in enumerate(classes)])
-
         for i, classitem in enumerate(classes):
             classitemdir = os.path.join(image_dir, classitem)
             filepaths = [os.path.join(classitem, filepath) for filepath in os.listdir(classitemdir)]
@@ -220,11 +218,12 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
             inputs, labels = data
             inputs = inputs.to(device)
             labels = labels.to(device)
-            outputs = net(inputs)
-            _, preds = torch.max(outputs, 1)
-            val_loss = criterion(outputs, labels)
-            val_running_loss += val_loss.item()
-            val_running_corrects += torch.sum(preds == torch.max(labels,1)[1])
+            with torch.no_grad():
+                outputs = net(inputs)
+                _, preds = torch.max(outputs, 1)
+                val_loss = criterion(outputs, labels)
+                val_running_loss += val_loss.item()
+                val_running_corrects += torch.sum(preds == torch.max(labels,1)[1])
 
             progress_bar.update(1)
             progress_bar.set_postfix(**{'val_loss': val_loss.item()})
@@ -255,7 +254,7 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
     net = get_net(backbone, 3, classnum)
 
     if ckptpath is not None:
-        print("finetuing from {args.ckptpath}...")
+        print(f"finetuing from {args.ckptpath}...")
         net.load_state_dict(torch.load(args.ckptpath))
 
     classes, image_files, image_labels = initialize_dataset(args.datadir, args.classnum)
