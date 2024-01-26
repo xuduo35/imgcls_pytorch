@@ -15,7 +15,7 @@ Put your images under a directory as below
 
 ## Train
 ```shell
-CUDA_VISIBLE_DEVICES=0 python3 -u train.py --backbone resnet101 --classnum 270 --workers 32 --lr=0.001 --epochs 30 --train_bs 160 --datadir your_dataset_directory
+CUDA_VISIBLE_DEVICES=0 python3 -u train.py --backbone resnet101 --workers 32 --lr=0.001 --epochs 30 --train_bs 160 --datadir your_dataset_directory
 ```
 
 ## Demo

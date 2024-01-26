@@ -69,7 +69,7 @@ def plot_classes_preds(net, images, labels, classes):
 
     return fig
 
-def initialize_dataset(image_dir, classnum=1000):
+def initialize_dataset(image_dir):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -84,7 +84,8 @@ def initialize_dataset(image_dir, classnum=1000):
 
     if not os.path.exists(trainfilepath) or not os.path.exists(labelfilepath):
         classes = os.listdir(image_dir)
-        assert(len(classes) == classnum)
+
+        print([(classitem.replace("_bd", ""), i) for i,classitem in enumerate(classes)])
 
         for i, classitem in enumerate(classes):
             classitemdir = os.path.join(image_dir, classitem)
@@ -135,6 +136,9 @@ class ImageFolderEx(Dataset):
     def __getitem__(self, index):
         image_name = os.path.join(self.image_dir, self.image_files[index])  
         image = cv2.imread(image_name)
+        if image is None:
+            print(image_name)
+            image = np.zeros((224,224,3), dtype=np.uint8)
         image = image[:,:,::-1]
         image = Image.fromarray(image)
         label = self.image_labels[index]
@@ -248,20 +252,21 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
 
     logging.close()
 
-def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
-    print(f"Using backbone: {backbone}")
+def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
+    classes, image_files, image_labels = initialize_dataset(args.datadir)
+    result = list(zip(image_files, image_labels))
+    np.random.shuffle(result)
+    image_files, image_labels = zip(*result)
+    trainlen = len(image_files)*6//7
+    classnum = len(classes)
+
+    print(f"Using backbone: {backbone}, classnum: {classnum}")
 
     net = get_net(backbone, 3, classnum)
 
     if ckptpath is not None:
         print(f"finetuing from {args.ckptpath}...")
         net.load_state_dict(torch.load(args.ckptpath))
-
-    classes, image_files, image_labels = initialize_dataset(args.datadir, args.classnum)
-    result = list(zip(image_files, image_labels))
-    np.random.shuffle(result)
-    image_files, image_labels = zip(*result)
-    trainlen = len(image_files)*6//7
     
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
@@ -269,7 +274,7 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
             args.datadir,
             image_files[:trainlen],
             image_labels[:trainlen],
-            args.classnum,
+            classnum,
             transforms.Compose([
                 transforms.RandomRotation([-13,13]),
                 transforms.RandomHorizontalFlip(p=0.5),
@@ -285,7 +290,7 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
             args.datadir,
             image_files[trainlen:],
             image_labels[trainlen:],
-            args.classnum,
+            classnum,
             transforms.Compose([
                 transforms.Resize(args.imgsz),
                 transforms.CenterCrop(args.imgsz),
@@ -303,7 +308,6 @@ def main(device, backbone, classnum=1000, lr=0.001, epochs=1, num_workers=1, ckp
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--backbone", default="resnet101", type=str, help="Options: alexnet, resnet18, resnet50")
-    parser.add_argument("--classnum", default=1000, type=int, help="Classes number")
     parser.add_argument("--datadir", default=None, type=str, help="Dataset path")
     parser.add_argument("--imgsz", default=224, type=int, help="Input image size")
     parser.add_argument("--train_bs", default=32, type=int, help="Train batch size")
@@ -330,5 +334,5 @@ if __name__ == "__main__":
         device = torch.device("cpu")
 
     main(
-        device, args.backbone, args.classnum, args.lr, args.epochs, args.workers, args.ckptpath
+        device, args.backbone, args.lr, args.epochs, args.workers, args.ckptpath
         )
