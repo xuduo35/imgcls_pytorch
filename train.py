@@ -146,6 +146,25 @@ class ImageFolderEx(Dataset):
         onehot[label] = 1
         return (image, np.array(onehot).astype(np.float32))   
 
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=0.25, gamma=2, reduction='mean'):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+        ce_loss = nn.CrossEntropyLoss(reduction='none')(inputs, targets)
+        pt = torch.exp(-ce_loss)
+        focal_loss = self.alpha * (1 - pt) ** self.gamma * ce_loss
+
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        else:
+            return focal_loss
+
 def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='resnet101'):
     print(f"Training on {device.type}")
 
@@ -161,7 +180,10 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
             T_max=args.epochs, eta_min=0.00001, last_epoch=-1
             )
 
-    criterion = nn.CrossEntropyLoss()
+    if args.losstype == 'focalloss':
+        criterion = FocalLoss()
+    else:
+        criterion = nn.CrossEntropyLoss()
 
     best_acc = 0.0
     step_count = 0
@@ -316,6 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("--ckptpath", default=None, type=str, help="Finetune from ckptpath")
     parser.add_argument("--savedir", default="./exp", type=str, help="Saving directory")
     parser.add_argument("--mixratio", default=0.7, type=float, help="learning rate")
+    parser.add_argument("--losstype", default='cross entropy', type=str, help="Loss type")
 
     args = parser.parse_args()
  
