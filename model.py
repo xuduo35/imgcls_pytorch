@@ -9,6 +9,10 @@ from collections import OrderedDict
 import torch.nn.functional as F
 import torch.nn.functional as F
 from efficientnet_pytorch import EfficientNet
+from torchvision.models import (
+        efficientnet_v2_s, efficientnet_v2_m, efficientnet_v2_l,
+        EfficientNet_V2_S_Weights, EfficientNet_V2_M_Weights, EfficientNet_V2_L_Weights
+        )
 from hubconf import *
 
 def mac(x):
@@ -953,6 +957,26 @@ def get_net_wsl(model_name, run_type, pool_type, embedding_size, channels, num_c
 
     return model
 
+def get_net_efficientnet_v2(
+        model_name, run_type, pool_type, embedding_size, channels, num_classes
+        ):
+    if model_name == 'efficientnet_v2_s':
+        model = efficientnet_v2_s(weights=EfficientNet_V2_S_Weights.IMAGENET1K_V1)
+        outchannels = 24
+    elif model_name == 'efficientnet_v2_m':
+        model = efficientnet_v2_m(weights=EfficientNet_V2_M_Weights.IMAGENET1K_V1)
+        outchannels = 24
+    elif model_name == 'efficientnet_v2_l':
+        model = efficientnet_v2_l(weights=EfficientNet_V2_L_Weights.IMAGENET1K_V1)
+        outchannels = 32
+
+    if channels != 3:
+        model.features[0][0] = nn.Conv2d(
+                3, outchannels, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False
+                )
+    model.classifier = nn.Linear(1280, num_classes)
+    return model
+
 def get_net(model_name, channels, num_classes):
     run_type = 'train'
     pool_type = 'normal'
@@ -1045,6 +1069,8 @@ def get_net(model_name, channels, num_classes):
     ##################  polynet #################
     elif model_name == 'polynet':
         return get_net_polynet(model_name, run_type, pool_type, embedding_size, channels, num_classes)
+    elif model_name in ['efficientnet_v2_s', 'efficientnet_v2_m', 'efficientnet_v2_l']:
+        return get_net_efficientnet_v2(model_name, run_type, pool_type, embedding_size, channels, num_classes)
     elif model_name.find('efficientnet') >= 0:
         return EfficientNet.from_pretrained(model_name, num_classes=num_classes)
     elif model_name.find('_wsl') >= 0:
@@ -1060,7 +1086,8 @@ if __name__ == '__main__':
     import sys
 
     #model = get_net("resnet34", 3, 4)
-    model = resnext101_32x8d_wsl(True)
+    #model = resnext101_32x8d_wsl(True)
+    model = get_net("efficientnet_v2_l", 3, 4)
     print(model)
     params = list(model.parameters())
     k = 0
