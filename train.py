@@ -174,11 +174,20 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
     mixup = v2.MixUp(num_classes=len(classes))
     cutmix_or_mixup = v2.RandomChoice([cutmix, mixup])
 
-    optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(
+    if args.optim == 'SGD':
+        optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+    else:
+        print("Using Adam optimizer by default...")
+        optimizer = optim.Adam([{'params': net.parameters(), 'lr': lr}])
+
+    if args.lrsched == 'CosineAnnealingLR':
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
             T_max=args.epochs, eta_min=0.00001, last_epoch=-1
             )
+    else:
+        print("Using StepLR scheduler by default...")
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10,  gamma=0.1)
 
     if args.losstype == 'focalloss':
         criterion = FocalLoss()
@@ -340,7 +349,7 @@ def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--backbone", default="resnet101", type=str, help="Options: alexnet, resnet18, resnet50")
+    parser.add_argument("--backbone", default="resnet101", type=str, help="Backbone, options: resnet50, resnet101, efficientnet-b4...")
     parser.add_argument("--datadir", default=None, type=str, help="Dataset path")
     parser.add_argument("--imgsz", default=224, type=int, help="Input image size")
     parser.add_argument("--train_bs", default=32, type=int, help="Train batch size")
@@ -352,6 +361,8 @@ if __name__ == "__main__":
     parser.add_argument("--savedir", default="./exp", type=str, help="Saving directory")
     parser.add_argument("--mixratio", default=0.3, type=float, help="Mix ratio for CutMix and MixUp")
     parser.add_argument("--losstype", default='cross entropy', type=str, help="Loss type")
+    parser.add_argument("--optim", default='SGD', type=str, help="Optimizer type, options: SGD, Adam")
+    parser.add_argument("--lrsched", default='CosineAnnealingLR', type=str, help='Learning rate scheduler, options: CosineAnnealingLR, StepLR')
 
     args = parser.parse_args()
  
