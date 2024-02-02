@@ -299,9 +299,22 @@ def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
                 transforms.RandomRotation([-13,13]),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomVerticalFlip(p=0.5),
-                transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+                transforms.RandomApply(
+                    nn.ModuleList([
+                        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+                        transforms.RandomGrayscale(),
+                        transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
+                        transforms.RandomAffine(degrees=0, shear=(-10, 10)),
+                        ]),
+                    p=0.5
+                    ),
                 transforms.Resize(args.imgsz+32*(args.imgsz//256+1)),
                 transforms.RandomCrop(args.imgsz),
+                transforms.RandomApply(nn.ModuleList([
+                        transforms.AugMix(severity= 6, mixture_width=2),
+                    ]),
+                    p=0.5
+                    ),
                 transforms.ToTensor(),
                 normalize
             ]))
@@ -337,7 +350,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", default=1, type=int, help="Number of training epochs")
     parser.add_argument("--ckptpath", default=None, type=str, help="Finetune from ckptpath")
     parser.add_argument("--savedir", default="./exp", type=str, help="Saving directory")
-    parser.add_argument("--mixratio", default=0.7, type=float, help="learning rate")
+    parser.add_argument("--mixratio", default=0.3, type=float, help="Mix ratio for CutMix and MixUp")
     parser.add_argument("--losstype", default='cross entropy', type=str, help="Loss type")
 
     args = parser.parse_args()
