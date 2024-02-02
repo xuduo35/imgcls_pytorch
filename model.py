@@ -40,7 +40,8 @@ def get_net_bninception(model_name, run_type, pool_type, embedding_size, channel
 
     model = bninception(pretrained="imagenet")
     model.global_pool = nn.AdaptiveAvgPool2d(1)
-    model.conv1_7x7_s2 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
+    if channels != 3:
+        model.conv1_7x7_s2 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(1024),
                 nn.Dropout(0.5),
@@ -52,7 +53,8 @@ def get_net_bninception_fc(model_name, run_type, pool_type, embedding_size, chan
                                                                                                                                     
     model = bninception(pretrained="imagenet")                                                                                      
     model.global_pool = nn.AdaptiveAvgPool2d(1)                                                                                     
-    model.conv1_7x7_s2 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))                          
+    if channels != 3:
+        model.conv1_7x7_s2 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))                          
     model.last_linear = nn.Sequential(                                                                                              
                 nn.BatchNorm1d(1024),                                                                                               
                 nn.Dropout(0.5),                                                                                                    
@@ -66,7 +68,8 @@ def get_net_bninception_fc(model_name, run_type, pool_type, embedding_size, chan
 def get_net_inceptionv3(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = inceptionv3(pretrained="imagenet")
     model.aux_logits = False
-    model.Conv2d_1a_3x3.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.Conv2d_1a_3x3.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(2048),
                 nn.Dropout(0.5),
@@ -83,7 +86,8 @@ def get_net_inceptionv3(model_name, run_type, pool_type, embedding_size, channel
 def get_net_inceptionv3_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = inceptionv3(pretrained="imagenet")
     model.aux_logits = False
-    model.Conv2d_1a_3x3.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.Conv2d_1a_3x3.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(2048),
                 nn.Dropout(0.5),
@@ -116,7 +120,8 @@ def get_net_inceptionv3_fc(model_name, run_type, pool_type, embedding_size, chan
 def get_net_inceptionv4(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = inceptionv4(pretrained="imagenet")
-    model.features[0].conv = nn.Conv2d(channels, 32,bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.features[0].conv = nn.Conv2d(channels, 32,bias=False, kernel_size=3, stride=2)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(1536),
@@ -128,7 +133,8 @@ def get_net_inceptionv4(model_name, run_type, pool_type, embedding_size, channel
 def get_net_inceptionv4_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = inceptionv4(pretrained="imagenet")
-    model.features[0].conv = nn.Conv2d(channels, 32,bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.features[0].conv = nn.Conv2d(channels, 32,bias=False, kernel_size=3, stride=2)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(1536),
@@ -154,7 +160,8 @@ def get_net_inceptionv4_fc(model_name, run_type, pool_type, embedding_size, chan
 def get_net_inceptionresnetv2(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = inceptionresnetv2(pretrained="imagenet")
-    model.conv2d_1a.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.conv2d_1a.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
     model.avgpool_1a = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
                 nn.Linear(1536, num_classes),
@@ -166,7 +173,8 @@ def get_net_inceptionresnetv2(model_name, run_type, pool_type, embedding_size, c
 def get_net_inceptionresnetv2_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = inceptionresnetv2(pretrained="imagenet")
-    model.conv2d_1a.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
+    if channels != 3:
+        model.conv2d_1a.conv = nn.Conv2d(channels, 32, bias=False, kernel_size=3, stride=2)
     model.avgpool_1a = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
                 nn.Linear(1536, 128),
@@ -181,7 +189,8 @@ def get_net_inceptionresnetv2_fc(model_name, run_type, pool_type, embedding_size
 def get_net_xception(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = xception(pretrained="imagenet")
-    model.conv1 = nn.Conv2d(channels, 32, 3,2, 0, bias=False)
+    if channels != 3:
+        model.conv1 = nn.Conv2d(channels, 32, 3,2, 0, bias=False)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(2048),
                 nn.Dropout(0.5),
@@ -221,7 +230,8 @@ def get_net_xception_fc(model_name, run_type, pool_type, embedding_size, channel
 def get_net_xception_att(model_name, run_type, pool_type, embedding_size, channels, num_classes):
 
     model = xception(pretrained="imagenet")
-    model.conv1 = nn.Conv2d(channels, 32, 3,2, 0, bias=False)
+    if channels != 3:
+        model.conv1 = nn.Conv2d(channels, 32, 3,2, 0, bias=False)
     model.last_linear = nn.Sequential(
                 nn.BatchNorm1d(2048),
                 nn.Dropout(0.5),
@@ -301,7 +311,8 @@ def get_net_xception_att(model_name, run_type, pool_type, embedding_size, channe
 
 def get_net_alexnet(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = alexnet(pretrained="imagenet")
-    model._features[0] = nn.Conv2d(channels, 64, kernel_size=11, stride=4, padding=2)
+    if channels != 3:
+        model._features[0] = nn.Conv2d(channels, 64, kernel_size=11, stride=4, padding=2)
     model._features[-1] = nn.AdaptiveAvgPool2d(1)
 
     model.last_linear = nn.Sequential(
@@ -361,7 +372,8 @@ def _get_basemodel_resnet(model_name, run_type, pool_type, embedding_size):
 def get_net_resnet(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model, last_linear_emb_size = _get_basemodel_resnet(model_name, run_type, pool_type, embedding_size)
 
-    model.conv1 = nn.Conv2d(channels, 64, kernel_size=7, stride=2, padding=3,
+    if channels != 3:
+        model.conv1 = nn.Conv2d(channels, 64, kernel_size=7, stride=2, padding=3,
                             bias=False)
     model.avgpool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
@@ -389,7 +401,8 @@ def get_net_resnet(model_name, run_type, pool_type, embedding_size, channels, nu
 
 def get_net_resnet_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model, last_linear_emb_size=_get_basemodel_resnet(model_name, run_type, pool_type, embedding_size)
-    model.conv1 = nn.Conv2d(channels, 64, kernel_size=7, stride=2, padding=3,
+    if channels != 3:
+        model.conv1 = nn.Conv2d(channels, 64, kernel_size=7, stride=2, padding=3,
                             bias=False)
     model.avgpool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
@@ -422,7 +435,8 @@ def get_net_resnet_fc(model_name, run_type, pool_type, embedding_size, channels,
 
 def get_net_vgg11_bn(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = vgg11_bn(pretrained="imagenet")
-    model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
+    if channels != 3:
+        model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
     model._features[-1] = nn.AdaptiveAvgPool2d(1)
 
     del model.last_linear
@@ -461,7 +475,8 @@ def get_net_vgg11_bn(model_name, run_type, pool_type, embedding_size, channels, 
 
 def get_net_vgg16_bn(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = vgg16_bn(pretrained="imagenet")
-    model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
+    if channels != 3:
+        model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
     model._features[-1] = nn.AdaptiveAvgPool2d(1)
 
     del model.last_linear
@@ -500,7 +515,8 @@ def get_net_vgg16_bn(model_name, run_type, pool_type, embedding_size, channels, 
 
 def get_net_vgg16_bn_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = vgg16_bn(pretrained="imagenet")
-    model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
+    if channels != 3:
+        model._features[0] = nn.Conv2d(channels, 64, kernel_size=3, padding=1)
     model._features[-1] = nn.AdaptiveAvgPool2d(1)
 
     del model.last_linear
@@ -544,7 +560,8 @@ def get_net_vgg16_bn_fc(model_name, run_type, pool_type, embedding_size, channel
 
 def get_net_resnext101_32x4d(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = resnext101_32x4d(pretrained="imagenet")
-    model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
+    if channels != 3:
+        model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(2048),
@@ -554,7 +571,8 @@ def get_net_resnext101_32x4d(model_name, run_type, pool_type, embedding_size, ch
     return model
 def get_net_resnext101_32x4d_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = resnext101_32x4d(pretrained="imagenet")
-    model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
+    if channels != 3:
+        model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(2048),
@@ -580,7 +598,8 @@ def get_net_resnext101_32x4d_fc(model_name, run_type, pool_type, embedding_size,
 
 def get_net_resnext101_64x4d(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = resnext101_64x4d(pretrained="imagenet")
-    model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
+    if channels != 3:
+        model.features[0] = nn.Conv2d(channels,64,(7, 7),(2, 2),(3, 3),1,1,bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(2048),
@@ -594,7 +613,8 @@ def get_net_resnext101_64x4d(model_name, run_type, pool_type, embedding_size, ch
 def get_net_densenet121(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet121(pretrained="imagenet")
 
-    model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(1024),
@@ -628,7 +648,8 @@ def get_net_densenet121(model_name, run_type, pool_type, embedding_size, channel
 def get_net_densenet121_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet121(pretrained="imagenet")
 
-    model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(1024),
@@ -682,7 +703,8 @@ def get_net_densenet121_fc(model_name, run_type, pool_type, embedding_size, chan
 
 def get_net_densenet161(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet161(pretrained="imagenet")
-    model.features.conv0 = nn.Conv2d(channels, 96, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 96, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(2208),
@@ -715,7 +737,8 @@ def get_net_densenet161(model_name, run_type, pool_type, embedding_size, channel
 
 def get_net_densenet161_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet161(pretrained="imagenet")
-    model.features.conv0 = nn.Conv2d(channels, 96, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 96, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(2208),
@@ -752,7 +775,8 @@ def get_net_densenet161_fc(model_name, run_type, pool_type, embedding_size, chan
 def get_net_densenet169(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet169(pretrained="imagenet")
 
-    model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(1664),
@@ -786,7 +810,8 @@ def get_net_densenet169(model_name, run_type, pool_type, embedding_size, channel
 def get_net_densenet169_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = densenet169(pretrained="imagenet")
 
-    model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    if channels != 3:
+        model.features.conv0 = nn.Conv2d(channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     #model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
         nn.BatchNorm1d(1664),
@@ -824,20 +849,23 @@ def get_net_densenet169_fc(model_name, run_type, pool_type, embedding_size, chan
 
 def get_net_dpn98(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = dpn98(pretrained="imagenet")
-    model.features.conv1_1.conv = nn.Conv2d(
-        channels, 96, kernel_size=7, stride=2, padding=3, bias=False)
+    if channels != 3:
+        model.features.conv1_1.conv = nn.Conv2d(
+            channels, 96, kernel_size=7, stride=2, padding=3, bias=False)
     model.last_linear = nn.Conv2d(2688, num_classes, kernel_size=1, bias=True)
     return model
 def get_net_dpn107(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = dpn107(pretrained="imagenet+5k")
-    model.features.conv1_1.conv = nn.Conv2d(
-        channels, 128, kernel_size=7, stride=2, padding=3, bias=False)
+    if channels != 3:
+        model.features.conv1_1.conv = nn.Conv2d(
+            channels, 128, kernel_size=7, stride=2, padding=3, bias=False)
     model.last_linear = nn.Conv2d(2688, num_classes, kernel_size=1, bias=True)
     return model
 def get_net_dpn131(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = dpn131(pretrained="imagenet")
-    model.features.conv1_1.conv = nn.Conv2d(
-        channels, 128, kernel_size=3, stride=2, padding=1, bias=False)
+    if channels != 3:
+        model.features.conv1_1.conv = nn.Conv2d(
+            channels, 128, kernel_size=3, stride=2, padding=1, bias=False)
     model.last_linear = nn.Conv2d(2688, num_classes, kernel_size=1, bias=True)
 
     return model
@@ -847,7 +875,8 @@ def get_net_dpn131(model_name, run_type, pool_type, embedding_size, channels, nu
 
 def get_net_senet154(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = senet154(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64, 3, stride=2, padding=1,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64, 3, stride=2, padding=1,
                                     bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
@@ -856,14 +885,16 @@ def get_net_senet154(model_name, run_type, pool_type, embedding_size, channels, 
 
 def get_net_se_resnet50(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet50(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
     return model
 def get_net_se_resnet50_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet50(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
@@ -875,14 +906,16 @@ def get_net_se_resnet50_fc(model_name, run_type, pool_type, embedding_size, chan
 
 def get_net_se_resnet101(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet101(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
     return model
 def get_net_se_resnet101_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet101(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
@@ -894,7 +927,8 @@ def get_net_se_resnet101_fc(model_name, run_type, pool_type, embedding_size, cha
 
 def get_net_se_resnet152(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet152(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
@@ -902,7 +936,8 @@ def get_net_se_resnet152(model_name, run_type, pool_type, embedding_size, channe
 
 def get_net_se_resnet152_fc(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnet152(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Sequential(
@@ -914,7 +949,8 @@ def get_net_se_resnet152_fc(model_name, run_type, pool_type, embedding_size, cha
 
 def get_net_se_resnext50_32x4d(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = se_resnext50_32x4d(pretrained="imagenet")
-    model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
+    if channels != 3:
+        model.layer0.conv1 = nn.Conv2d(channels, 64,kernel_size=7, stride=2,
                                     padding=3, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
@@ -923,7 +959,8 @@ def get_net_se_resnext50_32x4d(model_name, run_type, pool_type, embedding_size, 
 
 def get_net_pnasnet5large(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = pnasnet5large(pretrained='imagenet',num_classes=1000)
-    model.conv_0.conv = nn.Conv2d(channels,  96, kernel_size=3, stride=2, bias=False)
+    if channels != 3:
+        model.conv_0.conv = nn.Conv2d(channels,  96, kernel_size=3, stride=2, bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(4320, num_classes)
 
@@ -931,7 +968,8 @@ def get_net_pnasnet5large(model_name, run_type, pool_type, embedding_size, chann
 
 def get_net_polynet(model_name, run_type, pool_type, embedding_size, channels, num_classes):
     model = polynet(pretrained='imagenet')
-    model.stem.conv1[0].conv = nn.Conv2d(channels, 32, 3, stride=2,
+    if channels != 3:
+        model.stem.conv1[0].conv = nn.Conv2d(channels, 32, 3, stride=2,
                                     bias=False)
     model.avg_pool = nn.AdaptiveAvgPool2d(1)
     model.last_linear = nn.Linear(2048, num_classes)
