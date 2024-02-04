@@ -175,7 +175,11 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
     cutmix_or_mixup = v2.RandomChoice([cutmix, mixup])
 
     if args.optim == 'SGD':
+        print("Using SGD optimizer...")
         optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+    elif args.optim == 'Adam':
+        print("Using Adam optimizer...")
+        optimizer = optim.Adam([{'params': net.parameters(), 'lr': lr}])
     else:
         print("Using Adam optimizer by default...")
         optimizer = optim.Adam([{'params': net.parameters(), 'lr': lr}])
@@ -185,6 +189,9 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
             optimizer,
             T_max=args.epochs, eta_min=0.00001, last_epoch=-1
             )
+    elif args.lrsched == 'StepLR':
+        print("Using StepLR scheduler...")
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10,  gamma=0.1)
     else:
         print("Using StepLR scheduler by default...")
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10,  gamma=0.1)

@@ -1012,7 +1012,13 @@ def get_net_efficientnet_v2(
         model.features[0][0] = nn.Conv2d(
                 3, outchannels, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False
                 )
-    model.classifier = nn.Linear(1280, num_classes)
+
+    model.classifier = nn.Sequential(
+        nn.BatchNorm1d(1280),
+        nn.Dropout(0.5),
+        nn.Linear(1280, num_classes),
+        )
+
     return model
 
 def get_net(model_name, channels, num_classes):
