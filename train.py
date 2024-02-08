@@ -204,7 +204,7 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
     best_acc = 0.0
     step_count = 0
 
-    for epoch in range(epochs): 
+    for epoch in range(args.nextepoch,epochs): 
         print(f'Epoch {epoch}/{epochs}')
 
         # Train Stage
@@ -279,7 +279,8 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
 
         print(f"Val Loss: {val_loss}, Val Acc: {val_acc}")
 
-        if val_acc > best_acc:
+        #if val_acc > best_acc:
+        if True:
             best_acc = val_acc
             PATH = os.path.join(ckptdir, f"{backbone}-epoch{str(epoch).zfill(3)}.pth")
             torch.save(net.state_dict(), PATH)
@@ -288,7 +289,7 @@ def train(net, classes, trainloader, valloader, lr=0.001, epochs=1, backbone='re
 
     logging.close()
 
-def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
+def main(device, backbone, lr=0.001, nextepoch=0, epochs=1, num_workers=1, ckptpath=None):
     classes, image_files, image_labels = initialize_dataset(args.datadir)
     result = list(zip(image_files, image_labels))
     np.random.shuffle(result)
@@ -315,22 +316,26 @@ def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
                 transforms.RandomRotation([-13,13]),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomVerticalFlip(p=0.5),
-                transforms.RandomApply(
-                    nn.ModuleList([
-                        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
-                        transforms.RandomGrayscale(),
-                        transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
-                        transforms.RandomAffine(degrees=0, shear=(-10, 10)),
-                        ]),
-                    p=0.5
-                    ),
+                #transforms.RandomApply(
+                #    nn.ModuleList([
+                #        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+                #        transforms.RandomGrayscale(),
+                #        transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
+                #        transforms.RandomAffine(degrees=0, shear=(-10, 10)),
+                #        ]),
+                #    p=0.5
+                #    ),
+                transforms.AutoAugment(torchvision.transforms.AutoAugmentPolicy.IMAGENET),
+                #transforms.RandAugment(),
+                #transforms.TrivialAugmentWide(),
                 transforms.Resize(args.imgsz+32*(args.imgsz//256+1)),
                 transforms.RandomCrop(args.imgsz),
-                transforms.RandomApply(nn.ModuleList([
-                        transforms.AugMix(severity= 6, mixture_width=2),
-                    ]),
-                    p=0.5
-                    ),
+                transforms.AugMix(),
+                #transforms.RandomApply(nn.ModuleList([
+                #        transforms.AugMix(severity= 6, mixture_width=2),
+                #    ]),
+                #    p=0.5
+                #    ),
                 transforms.ToTensor(),
                 normalize
             ]))
@@ -348,9 +353,11 @@ def main(device, backbone, lr=0.001, epochs=1, num_workers=1, ckptpath=None):
             ]))
 
     train_loader = DataLoader(
-            train_data, batch_size=args.train_bs, shuffle=True, num_workers=num_workers
+            train_data, batch_size=args.train_bs, shuffle=True, num_workers=num_workers, drop_last=True
             )
-    val_loader = DataLoader(val_data, batch_size=args.val_bs, shuffle=False, num_workers=num_workers)
+    val_loader = DataLoader(
+            val_data, batch_size=args.val_bs, shuffle=False, drop_last=True, num_workers=num_workers
+            )
 
     train(net, classes, train_loader, val_loader, lr=lr, epochs=epochs, backbone=backbone)
 
@@ -364,6 +371,7 @@ if __name__ == "__main__":
     parser.add_argument("--workers", default=8, type=int, help="Number of workers")
     parser.add_argument("--lr", default=0.001, type=float, help="learning rate")
     parser.add_argument("--epochs", default=1, type=int, help="Number of training epochs")
+    parser.add_argument("--nextepoch", default=0, type=int, help="Next epoch number counting from")
     parser.add_argument("--ckptpath", default=None, type=str, help="Finetune from ckptpath")
     parser.add_argument("--savedir", default="./exp", type=str, help="Saving directory")
     parser.add_argument("--mixratio", default=0.3, type=float, help="Mix ratio for CutMix and MixUp")
@@ -386,5 +394,5 @@ if __name__ == "__main__":
         device = torch.device("cpu")
 
     main(
-        device, args.backbone, args.lr, args.epochs, args.workers, args.ckptpath
+        device, args.backbone, args.lr, args.nextepoch, args.epochs, args.workers, args.ckptpath
         )
