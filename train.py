@@ -84,6 +84,7 @@ def initialize_dataset(image_dir):
 
     if not os.path.exists(trainfilepath) or not os.path.exists(labelfilepath):
         classes = os.listdir(image_dir)
+        classes = sorted(classes)
 
         for i, classitem in enumerate(classes):
             classitemdir = os.path.join(image_dir, classitem)
